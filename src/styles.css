@@ -1,0 +1,15 @@
+/* Prime Icons (must come before any rules) */
+@import "primeicons/primeicons.css";
+
+/* Tailwind */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* QuantX logo styling to mimic bold italic wordmark */
+.quantx-logo {
+	font-family: "Segoe UI", "Montserrat", "Arial Black", Arial, sans-serif;
+	font-weight: 800;
+	font-style: italic;
+	letter-spacing: 0.5px;
+}

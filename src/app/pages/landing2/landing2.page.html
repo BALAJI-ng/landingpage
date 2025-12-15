@@ -1,0 +1,261 @@
+<div class="min-h-screen w-screen bg-slate-50 flex flex-col">
+  <!-- Header -->
+  <header
+    class="h-16 w-full flex items-center justify-between px-6 bg-[#2f7d32] text-white relative"
+  >
+    <div class="flex items-center gap-4">
+      <i
+        class="pi pi-bars cursor-pointer text-white text-xl"
+        (click)="toggleSidebar()"
+        aria-label="Toggle sidebar"
+      ></i>
+      <a routerLink="/" class="flex items-center gap-3" aria-label="Go to home">
+        <img
+          src="assets/Fidelity-header-logo.png"
+          alt="Fidelity logo"
+          class="h-8"
+        />
+        <span class="font-semibold text-white text-lg">Fidelity</span>
+      </a>
+    </div>
+    <!-- Centered brand -->
+    <div class="absolute left-1/2 -translate-x-1/2 pointer-events-none">
+      <span class="quantx-logo text-white text-2xl">QuantX</span>
+    </div>
+    <nav class="flex items-center gap-6 pr-8">
+      <i
+        class="pi pi-user text-white text-xl cursor-pointer"
+        aria-label="Profile"
+        (click)="toggleProfile()"
+      ></i>
+    </nav>
+    <!-- Click-outside backdrop -->
+    <div
+      *ngIf="isProfileOpen()"
+      class="fixed inset-0 z-40 bg-black/20 backdrop-blur-[2px]"
+      (click)="toggleProfile()"
+    ></div>
+    <!-- Profile dropdown aligned under icon -->
+    <div
+      *ngIf="isProfileOpen()"
+      class="absolute right-6 top-20 z-50 bg-white text-slate-900 rounded-2xl shadow-xl ring-1 ring-slate-200 w-[32rem]"
+    >
+      <div class="px-4 py-3 border-b border-slate-200 flex items-center gap-2">
+        <div
+          class="h-9 w-9 rounded-full bg-[#2f7d32]/10 text-[#2f7d32] flex items-center justify-center"
+        >
+          <i class="pi pi-user"></i>
+        </div>
+        <div class="font-semibold text-slate-800">Profile</div>
+      </div>
+      <div
+        class="px-4 py-3 text-[0.95rem] grid grid-cols-[8rem_1fr] gap-y-2 gap-x-4"
+      >
+        <span class="text-slate-600">User ID</span>
+        <span class="font-semibold text-slate-900">a802490</span>
+        <span class="text-slate-600">Full Name</span>
+        <span class="font-semibold text-slate-900">Balaji Thangavelu</span>
+        <span class="text-slate-600">Email</span>
+        <span
+          class="font-semibold text-slate-900 break-words"
+          title="balaji.thangavelu@vendor-restricted.fmr.com"
+          >balaji.thangavelu@vendor-restricted.fmr.com</span
+        >
+      </div>
+      <div class="px-4 pb-3">
+        <div class="h-1 rounded-b-2xl"></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex-1 w-full p-4">
+    <!-- Center content takes remaining space; footer stays visible -->
+    <div
+      class="h-full w-full border border-slate-300 bg-white shadow-sm flex overflow-hidden"
+    >
+      <!-- LEFT SIDEBAR (hover highlight in Fidelity green) -->
+      <aside
+        class="w-[280px] border-r border-slate-200 flex flex-col transform transition-transform duration-300"
+        [class.translate-x-0]="isSidebarOpen()"
+        [class.-translate-x-full]="!isSidebarOpen()"
+      >
+        <div class="flex-1 px-2 py-3 overflow-auto">
+          <ul class="space-y-2">
+            <li>
+              <a
+                class="flex items-center gap-3 px-3 py-2 rounded-md border border-slate-200 bg-white hover:bg-[#2f7d32] hover:text-white transition-colors"
+              >
+                <i class="pi pi-home"></i>
+                <span class="font-medium">Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a
+                class="flex items-center gap-3 px-3 py-2 rounded-md border border-slate-200 bg-white hover:bg-[#2f7d32] hover:text-white transition-colors"
+              >
+                <i class="pi pi-database"></i>
+                <span class="font-medium">Datasets</span>
+              </a>
+            </li>
+            <li>
+              <a
+                class="flex items-center gap-3 px-3 py-2 rounded-md border border-slate-200 bg-white hover:bg-[#2f7d32] hover:text-white transition-colors"
+              >
+                <i class="pi pi-sitemap"></i>
+                <span class="font-medium">Pipelines</span>
+              </a>
+            </li>
+            <li>
+              <a
+                class="flex items-center gap-3 px-3 py-2 rounded-md border border-slate-200 bg-white hover:bg-[#2f7d32] hover:text-white transition-colors"
+              >
+                <i class="pi pi-sliders-h"></i>
+                <span class="font-medium">Experiments</span>
+              </a>
+            </li>
+            <li>
+              <a
+                class="flex items-center gap-3 px-3 py-2 rounded-md border border-slate-200 bg-white hover:bg-[#2f7d32] hover:text-white transition-colors"
+              >
+                <i class="pi pi-box"></i>
+                <span class="font-medium">Models</span>
+              </a>
+            </li>
+            <li>
+              <a
+                class="flex items-center gap-3 px-3 py-2 rounded-md border border-slate-200 bg-white hover:bg-[#2f7d32] hover:text-white transition-colors"
+              >
+                <i class="pi pi-file"></i>
+                <span class="font-medium">Notebooks</span>
+              </a>
+            </li>
+            <li>
+              <a
+                class="flex items-center gap-3 px-3 py-2 rounded-md border border-slate-200 bg-white hover:bg-[#2f7d32] hover:text-white transition-colors"
+              >
+                <i class="pi pi-server"></i>
+                <span class="font-medium">Storage</span>
+              </a>
+            </li>
+            <li>
+              <a
+                class="flex items-center gap-3 px-3 py-2 rounded-md border border-slate-200 bg-white hover:bg-[#2f7d32] hover:text-white transition-colors"
+              >
+                <i class="pi pi-chart-line"></i>
+                <span class="font-medium">Monitoring</span>
+              </a>
+            </li>
+            <li>
+              <a
+                class="flex items-center gap-3 px-3 py-2 rounded-md border border-slate-200 bg-white hover:bg-[#2f7d32] hover:text-white transition-colors"
+              >
+                <i class="pi pi-lock"></i>
+                <span class="font-medium">Access Control</span>
+              </a>
+            </li>
+            <li>
+              <a
+                class="flex items-center gap-3 px-3 py-2 rounded-md border border-slate-200 bg-white hover:bg-[#2f7d32] hover:text-white transition-colors"
+              >
+                <i class="pi pi-cog"></i>
+                <span class="font-medium">Settings</span>
+              </a>
+            </li>
+            <li>
+              <a
+                class="flex items-center gap-3 px-3 py-2 rounded-md border border-slate-200 bg-white hover:bg-[#2f7d32] hover:text-white transition-colors"
+              >
+                <i class="pi pi-book"></i>
+                <span class="font-medium">Docs</span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="mt-4">
+            <button
+              pButton
+              type="button"
+              class="w-full"
+              icon="pi pi-comments"
+              label="Chat"
+              (click)="openChat()"
+            ></button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- CENTER WORKSPACE -->
+      <main class="flex-1 relative overflow-auto">
+        <div class="absolute inset-0">
+          <div class="h-full w-full bg-white"></div>
+        </div>
+      </main>
+
+      <!-- RIGHT CHAT PANEL (toggle) -->
+      <aside
+        *ngIf="isChatOpen()"
+        class="w-[380px] border-l border-slate-300 flex flex-col"
+      >
+        <div
+          class="h-14 flex items-center justify-between px-4 border-b border-slate-300 font-medium"
+        >
+          <span>Chat</span>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-times"
+            class="!shadow-none"
+            (click)="closeChat()"
+          ></button>
+        </div>
+        <div class="flex-1 p-4"></div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="w-full border-t border-slate-200 bg-slate-50 text-slate-600">
+    <div class="max-w-screen-2xl mx-auto px-6 py-4 flex items-center gap-6">
+      <div class="flex items-center gap-3">
+        <a
+          href="https://www.fidelity.com"
+          target="_blank"
+          rel="noopener"
+          class="flex items-center gap-2"
+          aria-label="Fidelity Investments homepage"
+        >
+          <img
+            src="assets/Fidelity-footer-logo.png"
+            alt="Fidelity logo"
+            class="h-6"
+          />
+        </a>
+      </div>
+      <nav class="flex flex-wrap gap-x-4 gap-y-2 text-sm">
+        <a href="#" class="text-sky-700 hover:underline">Terms of Use</a>
+        <span class="text-slate-400">|</span>
+        <a href="#" class="text-sky-700 hover:underline">Privacy</a>
+        <span class="text-slate-400">|</span>
+        <a href="#" class="text-sky-700 hover:underline">Security</a>
+        <span class="text-slate-400">|</span>
+        <a href="#" class="text-sky-700 hover:underline">Site Map</a>
+        <span class="text-slate-400">|</span>
+        <a href="#" class="text-sky-700 hover:underline">Accessibility</a>
+        <span class="text-slate-400">|</span>
+        <a href="#" class="text-sky-700 hover:underline">Contact Us</a>
+        <span class="text-slate-400">|</span>
+        <a href="#" class="text-sky-700 hover:underline">Share Your Screen</a>
+        <span class="text-slate-400">|</span>
+        <a href="#" class="text-sky-700 hover:underline">Disclosures</a>
+      </nav>
+      <div class="ml-auto text-sm">
+        <span>Copyright 1998-2025 FMR LLC. All Rights Reserved.</span>
+      </div>
+    </div>
+    <div class="max-w-screen-2xl mx-auto px-6 pb-4 text-sm">
+      <a href="#" class="text-sky-700 hover:underline"
+        >This is for persons in the US only.</a
+      >
+    </div>
+  </footer>
+</div>

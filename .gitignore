@@ -1,0 +1,38 @@
+## Dependencies
+node_modules/
+
+## Builds
+dist/
+build/
+out/
+
+## Angular cache
+.angular/
+.angular/cache/
+
+## Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+## Editor
+.vscode/
+.idea/
+*.swp
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Environment
+.env
+.env.*
+
+## Coverage
+coverage/
+
+## Misc
+.tmp/
+.sass-cache/

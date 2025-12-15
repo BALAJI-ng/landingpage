@@ -1,0 +1,142 @@
+<div class="h-screen w-screen bg-slate-50">
+  <div class="h-full w-full p-4">
+    <div
+      class="h-full w-full border border-slate-300 bg-white shadow-sm flex overflow-hidden"
+    >
+      <!-- LEFT SIDEBAR -->
+      <aside class="w-[220px] border-r border-slate-300 flex flex-col">
+        <div
+          class="h-14 flex items-center justify-center border-b border-slate-300 font-semibold tracking-wide"
+        >
+          QuantX
+        </div>
+
+        <div class="flex-1 flex flex-col">
+          <button
+            pButton
+            type="button"
+            class="w-full !justify-start !rounded-none !border-0 !shadow-none"
+            [severity]="active() === 'data' ? 'primary' : 'secondary'"
+            (click)="setActive('data')"
+            label="Data"
+          ></button>
+
+          <button
+            pButton
+            type="button"
+            class="w-full !justify-start !rounded-none !border-0 !shadow-none"
+            [severity]="active() === 'projects' ? 'primary' : 'secondary'"
+            (click)="setActive('projects')"
+            label="Projects"
+          ></button>
+
+          <div class="flex-1"></div>
+
+          <button
+            pButton
+            type="button"
+            class="w-full !justify-start !rounded-none !border-0 !shadow-none border-t border-slate-200"
+            [severity]="active() === 'admin' ? 'primary' : 'secondary'"
+            (click)="setActive('admin')"
+            label="Admin"
+          ></button>
+
+          <button
+            pButton
+            type="button"
+            class="w-full !justify-start !rounded-none !border-0 !shadow-none border-t border-slate-200"
+            [severity]="active() === 'help' ? 'primary' : 'secondary'"
+            (click)="setActive('help')"
+            label="Help"
+          ></button>
+
+          <button
+            pButton
+            type="button"
+            class="w-full !justify-start !rounded-none !border-0 !shadow-none border-t border-slate-200"
+            icon="pi pi-comments"
+            label="Chat"
+            [severity]="'secondary'"
+            (click)="openChat()"
+          ></button>
+        </div>
+      </aside>
+
+      <!-- CENTER WORKSPACE -->
+      <main class="flex-1 relative">
+        <div class="absolute inset-0">
+          <div class="h-full w-full bg-white">
+            <!-- Empty workspace area -->
+          </div>
+        </div>
+      </main>
+
+      <!-- RIGHT CHAT PANEL (toggle) -->
+      <aside
+        *ngIf="isChatOpen()"
+        class="w-[380px] border-l border-slate-300 flex flex-col"
+      >
+        <div
+          class="h-14 flex items-center justify-between px-4 border-b border-slate-300 font-medium"
+        >
+          <span>Chat</span>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-times"
+            class="!shadow-none"
+            (click)="closeChat()"
+          ></button>
+        </div>
+
+        <div class="flex-1 overflow-auto p-4 space-y-3">
+          <ng-container *ngFor="let m of messages()">
+            <div class="flex" [class.justify-end]="m.from === 'user'">
+              <div
+                class="max-w-[85%] rounded-lg px-3 py-2 text-sm border"
+                [class.bg-slate-50]="m.from === 'assistant'"
+                [class.border-slate-200]="m.from === 'assistant'"
+                [class.bg-blue-50]="m.from === 'user'"
+                [class.border-blue-200]="m.from === 'user'"
+              >
+                <div class="whitespace-pre-wrap">{{ m.text }}</div>
+              </div>
+            </div>
+          </ng-container>
+
+          <div class="flex justify-end pt-2">
+            <button
+              pButton
+              type="button"
+              class="!shadow-none"
+              label="Create a back testing project"
+              severity="secondary"
+              (click)="chatInput='Create a back testing project'; send()"
+            ></button>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-300 p-3">
+          <div class="flex gap-2 items-center">
+            <input
+              pInputText
+              class="w-full"
+              placeholder="Type your request…"
+              [(ngModel)]="chatInput"
+              (keydown.enter)="send()"
+            />
+            <button
+              pButton
+              type="button"
+              icon="pi pi-send"
+              (click)="send()"
+            ></button>
+          </div>
+          <div class="text-[11px] text-slate-500 mt-2">
+            Tip: Press Enter to send
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
