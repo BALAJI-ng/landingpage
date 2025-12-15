@@ -1,12 +1,12 @@
 import { Component, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
+import { RouterModule } from "@angular/router";
 import { ButtonModule } from "primeng/button";
 import { InputTextModule } from "primeng/inputtext";
-import { RouterModule } from "@angular/router";
 
 @Component({
-  selector: "app-landing-page-2",
+  selector: "app-landing-page-3",
   standalone: true,
   imports: [
     CommonModule,
@@ -15,31 +15,23 @@ import { RouterModule } from "@angular/router";
     ButtonModule,
     InputTextModule,
   ],
-  templateUrl: "./landing2.page.html",
+  templateUrl: "./landing3.page.html",
 })
-export class LandingPage2Component {
-  active = signal<"data" | "projects" | "admin" | "help" | "chat">("data");
-  isChatOpen = signal<boolean>(false);
+export class LandingPage3Component {
   isSidebarOpen = signal<boolean>(true);
   isProfileOpen = signal<boolean>(false);
+  isChatOpen = signal<boolean>(false);
 
-  setActive(key: "data" | "projects" | "admin" | "help") {
-    this.active.set(key);
-    this.isChatOpen.set(false);
+  toggleSidebar() {
+    this.isSidebarOpen.update((v) => !v);
   }
-
+  toggleProfile() {
+    this.isProfileOpen.update((v) => !v);
+  }
   openChat() {
     this.isChatOpen.set(true);
   }
   closeChat() {
     this.isChatOpen.set(false);
-  }
-
-  toggleSidebar() {
-    this.isSidebarOpen.update((v) => !v);
-  }
-
-  toggleProfile() {
-    this.isProfileOpen.update((v) => !v);
   }
 }

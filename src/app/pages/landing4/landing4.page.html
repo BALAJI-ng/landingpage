@@ -1,0 +1,164 @@
+<div class="min-h-screen w-screen bg-slate-50 flex flex-col">
+  <!-- Green gradient header with centered tabs -->
+  <header
+    class="w-full bg-gradient-to-r from-[#2f7d32] to-[#256628] text-white border-b border-white/10"
+  >
+    <div
+      class="h-16 max-w-screen-2xl mx-auto px-6 flex items-center justify-between"
+    >
+      <div class="flex items-center gap-4">
+        <i
+          class="pi pi-bars cursor-pointer text-xl"
+          (click)="toggleSidebar()"
+        ></i>
+        <a
+          routerLink="/"
+          class="flex items-center gap-3"
+          aria-label="Go to home"
+        >
+          <img
+            src="assets/Fidelity-header-logo.png"
+            alt="Fidelity logo"
+            class="h-8"
+          />
+        </a>
+      </div>
+      <nav class="hidden md:flex items-center gap-6">
+        <a
+          class="opacity-90 hover:opacity-100 underline-offset-4 hover:underline"
+          >Overview</a
+        >
+        <a class="opacity-90 hover:opacity-100">Lab</a>
+        <a class="opacity-90 hover:opacity-100">Docs</a>
+      </nav>
+      <div class="flex items-center gap-3">
+        <a
+          routerLink="/landing3"
+          class="hidden sm:inline-flex items-center px-3 py-1 rounded-md border border-white/70 text-white/95 hover:bg-white/10 text-sm"
+          >Landing 3</a
+        >
+        <a
+          routerLink="/landing5"
+          class="hidden sm:inline-flex items-center px-3 py-1 rounded-md border border-white/70 text-white/95 hover:bg-white/10 text-sm"
+          >Landing 5</a
+        >
+        <i
+          class="pi pi-user text-xl cursor-pointer"
+          (click)="toggleProfile()"
+        ></i>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero band -->
+  <div class="bg-white">
+    <div class="max-w-screen-2xl mx-auto px-6 py-8 sm:py-10">
+      <h1 class="text-2xl sm:text-3xl font-semibold text-slate-900">
+        Fidelity Data Lab
+      </h1>
+      <p class="mt-2 text-slate-600 max-w-2xl">
+        Explore datasets, orchestrate pipelines, and manage model lifecycles
+        with a clean Fidelity-inspired interface.
+      </p>
+      <div class="mt-4 flex gap-3">
+        <button
+          pButton
+          type="button"
+          label="Get Started"
+          class="p-button-success"
+        ></button>
+        <a
+          routerLink="/landing2"
+          class="inline-flex items-center px-3 py-2 rounded-md border border-slate-300 text-slate-700 hover:bg-slate-50"
+          >See Landing 2</a
+        >
+      </div>
+    </div>
+  </div>
+
+  <div class="flex-1 w-full">
+    <div class="h-full w-full flex overflow-hidden">
+      <!-- Sidebar (simple) -->
+      <aside
+        class="w-[250px] bg-white border-r border-slate-200 transform transition-transform duration-300"
+        [class.translate-x-0]="isSidebarOpen()"
+        [class.-translate-x-full]="!isSidebarOpen()"
+      >
+        <div
+          class="px-3 py-3 border-b border-slate-200 font-semibold text-slate-700"
+        >
+          Navigation
+        </div>
+        <ul class="p-3 space-y-2">
+          <li>
+            <a
+              class="block px-3 py-2 rounded-md hover:bg-[#2f7d32]/10 text-slate-800"
+              >Datasets</a
+            >
+          </li>
+          <li>
+            <a
+              class="block px-3 py-2 rounded-md hover:bg-[#2f7d32]/10 text-slate-800"
+              >Pipelines</a
+            >
+          </li>
+          <li>
+            <a
+              class="block px-3 py-2 rounded-md hover:bg-[#2f7d32]/10 text-slate-800"
+              >Experiments</a
+            >
+          </li>
+          <li>
+            <a
+              class="block px-3 py-2 rounded-md hover:bg-[#2f7d32]/10 text-slate-800"
+              >Models</a
+            >
+          </li>
+        </ul>
+      </aside>
+
+      <!-- Content (cards) -->
+      <main class="flex-1 overflow-auto bg-slate-50 p-6">
+        <div class="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-sm p-5">
+            <div class="text-slate-500 text-sm">Datasets</div>
+            <div class="mt-2 text-3xl font-semibold text-slate-900">248</div>
+            <div class="mt-3 text-xs text-[#2f7d32]">+12 this week</div>
+          </div>
+          <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-sm p-5">
+            <div class="text-slate-500 text-sm">Pipelines</div>
+            <div class="mt-2 text-3xl font-semibold text-slate-900">37</div>
+            <div class="mt-3 text-xs text-[#2f7d32]">3 running now</div>
+          </div>
+          <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-sm p-5">
+            <div class="text-slate-500 text-sm">Models</div>
+            <div class="mt-2 text-3xl font-semibold text-slate-900">61</div>
+            <div class="mt-3 text-xs text-[#2f7d32]">5 updated today</div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer class="w-full border-t border-slate-200 bg-slate-50 text-slate-600">
+    <div class="max-w-screen-2xl mx-auto px-6 py-4 flex items-center gap-6">
+      <div class="flex items-center gap-3">
+        <a
+          href="https://www.fidelity.com"
+          target="_blank"
+          rel="noopener"
+          aria-label="Fidelity Investments homepage"
+        >
+          <img
+            src="assets/Fidelity-footer-logo.png"
+            alt="Fidelity logo"
+            class="h-6"
+          />
+        </a>
+      </div>
+      <div class="ml-auto text-sm">
+        Copyright 1998-2025 FMR LLC. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+</div>
