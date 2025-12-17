@@ -1,13 +1,15 @@
 pipeline {
   agent any
-  options { timestamps(); ansiColor('xterm') }
+
+  options {
+    timestamps()
+    ansiColor('xterm')
+  }
 
   parameters {
     string(name: 'REGISTRY_URL', defaultValue: 'deepabalajidevops.jfrog.io', description: 'Artifactory Docker registry hostname (no protocol)')
     string(name: 'REGISTRY_REPO', defaultValue: 'docker-trial', description: 'Artifactory Docker repo name')
     string(name: 'IMAGE_NAME', defaultValue: 'quantx-landing', description: 'Image name')
-
-    // keep this as a simple suffix; we build final tag ourselves
     string(name: 'IMAGE_TAG_SUFFIX', defaultValue: '', description: 'Optional tag suffix (ex: rc1). Leave empty for normal builds.')
 
     string(name: 'OCP_API_URL', defaultValue: '', description: 'OpenShift API URL, e.g. https://api.<cluster>:6443')
@@ -21,85 +23,79 @@ pipeline {
   }
 
   environment {
-    // ✅ Real tag computed at runtime
-    IMAGE_TAG = "${env.BUILD_NUMBER}${params.IMAGE_TAG_SUFFIX ? "-${params.IMAGE_TAG_SUFFIX}" : ""}"
+    IMAGE_TAG = "${env.BUILD_NUMBER}${params.IMAGE_TAG_SUFFIX?.trim() ? "-${params.IMAGE_TAG_SUFFIX.trim()}" : ''}"
     IMAGE_REF = "${params.REGISTRY_URL}/${params.REGISTRY_REPO}/${params.IMAGE_NAME}:${IMAGE_TAG}"
   }
 
   stages {
-    stage('Checkout') { steps { checkout scm } }
+    stage('Checkout') {
+      steps { checkout scm }
+    }
 
     stage('Verify Tooling') {
+      agent { docker { image 'node:20-bullseye' } }
       steps {
         sh 'node -v'
         sh 'npm -v'
-        sh 'docker --version'
       }
     }
 
-    stage('Install Deps') { steps { sh 'npm ci' } }
+    stage('Install Deps') {
+      agent { docker { image 'node:20-bullseye' } }
+      steps { sh 'npm ci' }
+    }
 
     stage('Build Angular') {
+      agent { docker { image 'node:20-bullseye' } }
       steps { sh 'npm run build -- --configuration production' }
     }
 
     stage('Docker Build & Push') {
+      agent {
+        docker {
+          image 'docker:27-cli'
+          args  '-v /var/run/docker.sock:/var/run/docker.sock'
+        }
+      }
       steps {
         withCredentials([usernamePassword(credentialsId: params.REGISTRY_CREDENTIALS_ID, usernameVariable: 'REG_USER', passwordVariable: 'REG_PASS')]) {
-          sh '''
+          sh """
             set -e
-            echo "$REG_PASS" | docker login ${REGISTRY_URL} -u "$REG_USER" --password-stdin
-            docker build -t ${IMAGE_REF} .
-            docker push ${IMAGE_REF}
-          '''
+            echo "\$REG_PASS" | docker login ${params.REGISTRY_URL} -u "\$REG_USER" --password-stdin
+            docker version
+            docker build -t ${env.IMAGE_REF} .
+            docker push ${env.IMAGE_REF}
+          """
         }
       }
     }
 
-    stage('Ensure oc CLI') {
-      steps {
-        sh '''
-          set -e
-          if ! command -v oc >/dev/null 2>&1; then
-            curl -sLo oc.tgz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz
-            tar -xzf oc.tgz oc
-            chmod +x oc
-            sudo mv oc /usr/local/bin/oc || mv oc ./oc
-          fi
-          oc version --client
-        '''
-      }
-    }
-
-    stage('Login to OpenShift') {
+    stage('Deploy to OpenShift') {
+      agent { docker { image 'quay.io/openshift/origin-cli:latest' } }
       steps {
         withCredentials([string(credentialsId: params.OCP_TOKEN_CREDENTIALS_ID, variable: 'OCP_TOKEN')]) {
-          sh 'oc login --token="$OCP_TOKEN" --server="${params.OCP_API_URL}" --insecure-skip-tls-verify=true'
-        }
-        // ✅ safer: don’t assume you can create projects
-        sh 'oc project ${params.OCP_PROJECT} || oc new-project ${params.OCP_PROJECT}'
-      }
-    }
+          sh """
+            set -e
+            oc version --client
+            oc login --token="\$OCP_TOKEN" --server="${params.OCP_API_URL}" --insecure-skip-tls-verify=true
+            oc project ${params.OCP_PROJECT} || oc new-project ${params.OCP_PROJECT}
 
-    stage('Deploy') {
-      steps {
-        script {
-          if (params.CREATE_RESOURCES) {
-            sh 'oc apply -f openshift/service.yaml -n ${params.OCP_PROJECT}'
-            sh 'oc apply -f openshift/route.yaml -n ${params.OCP_PROJECT}'
-            sh 'oc apply -f openshift/deployment.yaml -n ${params.OCP_PROJECT}'
-          }
+            if [ "${params.CREATE_RESOURCES}" = "true" ]; then
+              oc apply -f openshift/service.yaml -n ${params.OCP_PROJECT}
+              oc apply -f openshift/route.yaml -n ${params.OCP_PROJECT}
+              oc apply -f openshift/deployment.yaml -n ${params.OCP_PROJECT}
+            fi
 
-          // ✅ update image
-          sh 'oc set image deployment/${params.IMAGE_NAME} ${params.IMAGE_NAME}=${IMAGE_REF} -n ${params.OCP_PROJECT} --record'
-          sh 'oc rollout status deployment/${params.IMAGE_NAME} -n ${params.OCP_PROJECT}'
+            oc set image deployment/${params.IMAGE_NAME} ${params.IMAGE_NAME}=${env.IMAGE_REF} -n ${params.OCP_PROJECT} --record
+            oc rollout status deployment/${params.IMAGE_NAME} -n ${params.OCP_PROJECT}
 
-          if (params.ROLLOUT_RESTART) {
-            sh 'oc rollout restart deployment/${params.IMAGE_NAME} -n ${params.OCP_PROJECT}'
-            sh 'oc rollout status deployment/${params.IMAGE_NAME} -n ${params.OCP_PROJECT}'
-          }
+            if [ "${params.ROLLOUT_RESTART}" = "true" ]; then
+              oc rollout restart deployment/${params.IMAGE_NAME} -n ${params.OCP_PROJECT}
+              oc rollout status deployment/${params.IMAGE_NAME} -n ${params.OCP_PROJECT}
+            fi
 
-          sh 'echo "App URL: http://$(oc get route ${params.IMAGE_NAME} -n ${params.OCP_PROJECT} -o jsonpath={.spec.host})"'
+            echo "App URL: http://\$(oc get route ${params.IMAGE_NAME} -n ${params.OCP_PROJECT} -o jsonpath='{.spec.host}')"
+          """
         }
       }
     }
