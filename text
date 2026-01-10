@@ -1,0 +1,68 @@
+import { Injectable, inject } from '@angular/core';
+import { Observable, map, shareReplay } from 'rxjs';
+
+import { ArrowRestService } from '@fmr-pr000264/ames-arrow-rest-service';
+import {
+  ARROW_APPLICATION,
+  ROLE_QUANT_ADMIN,
+  ROLE_QUANT_DEV,
+  ROLE_QUANT_VIEWER,
+} from './roles.constants';
+
+@Injectable({ providedIn: 'root' })
+export class AuthorizationService {
+
+  private readonly arrowRest = inject(ArrowRestService);
+
+  /**
+   * Arrow returns a list of authorized "functions"
+   * Example:
+   * [
+   *   "AMT_QRIT_QuantDev",
+   *   "AMT_QRIT_QuantAdmin"
+   * ]
+   */
+  private readonly authorizedFunctions$: Observable<string[]> =
+    this.arrowRest
+      .getAuthorizedFunctionNames(ARROW_APPLICATION, 'AMES')
+      .pipe(shareReplay(1));
+
+  /* ----------------------------
+   * Generic helpers
+   * ---------------------------- */
+
+  hasRole(role: string): Observable<boolean> {
+    return this.authorizedFunctions$.pipe(
+      map(roles => roles.includes(role))
+    );
+  }
+
+  hasAnyRole(roles: string[]): Observable<boolean> {
+    return this.authorizedFunctions$.pipe(
+      map(userRoles => roles.some(r => userRoles.includes(r)))
+    );
+  }
+
+  /* ----------------------------
+   * Quant-specific helpers
+   * ---------------------------- */
+
+  isAdmin(): Observable<boolean> {
+    return this.hasRole(ROLE_QUANT_ADMIN);
+  }
+
+  isDeveloper(): Observable<boolean> {
+    return this.hasAnyRole([
+      ROLE_QUANT_ADMIN,
+      ROLE_QUANT_DEV
+    ]);
+  }
+
+  isViewer(): Observable<boolean> {
+    return this.hasAnyRole([
+      ROLE_QUANT_ADMIN,
+      ROLE_QUANT_DEV,
+      ROLE_QUANT_VIEWER
+    ]);
+  }
+}
